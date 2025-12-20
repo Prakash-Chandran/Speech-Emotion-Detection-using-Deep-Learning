@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Advanced Speech Emotion Recognition AI">
+    <title>EmotiVoice AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.css">
+    <link rel="stylesheet" href="{{ url_for('speech.static', filename='speech_style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* New Styles for Social Buttons & Resume */
+        .social-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 250px;
+            margin: 20px auto;
+        }
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: white !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .social-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
+        }
+        .btn-insta { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .btn-github { background: #333; }
+        .btn-linkedin { background: #0077b5; }
+        
+        .btn-resume {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white !important;
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 600;
+            width: 100%;
+            max-width: 250px;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+        }
+        .btn-resume:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(56, 239, 125, 0.5);
+        }
+    </style>
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-microphone-alt"></i>
+                <span>EmotiVoice AI</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('dashboard') }}" class="dashboard-link"><i class="fas fa-th-large"></i> Dashboard</a></li>
+                <li><a href="#" onclick="goHome()" data-lang="home">Home</a></li>
+                <li><a href="#features" data-lang="features">Features</a></li>
+                <li><a href="#history-section" data-lang="history">History</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="settings-btn" onclick="openSettings()"><i class="fas fa-cog"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-lang="settingsTitle">Settings</h2>
+                <span class="close-modal" onclick="closeSettings()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <label data-lang="languageLabel">Language</label>
+                    <select id="languageSelect" onchange="changeLanguage(this.value)">
+                        <option value="en">English</option>
+                        <option value="es">Español (Spanish)</option>
+                        <option value="fr">Français (French)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label data-lang="darkModeLabel">Appearance</label>
+                    <div class="theme-switch-wrapper">
+                        <span class="theme-label-text">Light</span>
+                        <label class="theme-switch">
+                            <input type="checkbox" id="themeCheckbox" onchange="toggleTheme()">
+                            <span class="slider round">
+                                <i class="fas fa-sun sun-icon"></i>
+                                <i class="fas fa-moon moon-icon"></i>
+                            </span>
+                        </label>
+                        <span class="theme-label-text">Dark</span>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label data-lang="aboutLabel">About</label>
+                    <button class="btn btn-primary" onclick="showCreatorPage()" style="width: 100%;">
+                        <i class="fas fa-user-circle"></i> <span data-lang="creatorBtn" style="margin-left:8px;">Creator Details</span>
+                    </button>
+                </div>
+                <div class="setting-item" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 10px;">
+                    <label style="color: #ff4d4d;">Account</label>
+                    <a href="{{ url_for('logout') }}" class="btn btn-reset" style="width: 100%; text-decoration: none; display: flex; align-items: center; justify-content: center; background: #ff4d4d; color: white;">
+                        <i class="fas fa-sign-out-alt"></i> <span style="margin-left:8px;">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="filenameModal" class="modal hidden" style="z-index: 3000;">
+        <div class="modal-content small-modal">
+            <div class="modal-header">
+                <h3>Name Your Report</h3>
+                <span class="close-modal" onclick="closeFilenameModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 10px; color: var(--secondary-color);">Enter a name for the PDF file:</p>
+                <input type="text" id="filenameInput" class="modal-input" placeholder="EmotiVoice_Report" value="EmotiVoice_Report">
+                <div class="modal-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button onclick="closeFilenameModal()" class="btn btn-reset">Cancel</button>
+                    <button onclick="confirmDownload()" class="btn btn-primary">Download PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainContent">
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">EmotiVoice AI</h1>
+                <p class="hero-subtitle" data-lang="heroSubtitle">Detect emotions from speech in real-time using advanced deep learning</p>
+            </div>
+        </section>
+
+        <main class="main-container">
+            <section id="analysis" class="container">
+                <div class="upload-card-modern">
+                    <div class="step-indicator">
+                        <div class="step-item active"><div class="step-number">1</div><div class="step-text" data-lang="stepUpload">Upload</div></div>
+                        <div class="step-line"></div>
+                        <div class="step-item"><div class="step-number">2</div><div class="step-text" data-lang="stepAnalyze">Analyze</div></div>
+                        <div class="step-line"></div>
+                        <div class="step-item"><div class="step-number">3</div><div class="step-text" data-lang="stepResults">Results</div></div>
+                    </div>
+                    <div class="recording-container">
+                        <button id="recordBtn" class="btn primary">🔴 Start Recording</button>
+                        <button id="stopBtn" class="btn secondary" disabled>⏹️ Stop & Analyze</button>
+                        <p id="recordTimer">00:00</p>
+                    </div>
+                    <div class="upload-area-modern" id="dropArea">
+                        <div class="upload-box-modern" onclick="document.getElementById('audioFile').click();">
+                            <div class="upload-content">
+                                <div class="audio-icon-wrapper"><i class="fas fa-microphone"></i></div>
+                                <h3 class="upload-title" data-lang="uploadTitle">Upload Your Audio</h3>
+                                <p class="upload-subtitle" data-lang="uploadSubtitle">Drop your audio file here or click to browse</p>
+                                <div class="upload-hint">Supported formats: MP3, WAV, OGG, M4A, FLAC</div>
+                            </div>
+                            <input type="file" id="audioFile" accept="audio/*" class="file-input" hidden>
+                        </div>
+                        <div class="file-display-modern">
+                            <span class="file-label" data-lang="selectedFile">Selected File:</span>
+                            <span id="fileName" class="file-name">No file chosen</span>
+                        </div>
+                    </div>
+                    <div class="button-group-modern">
+                        <button id="analyzeBtn" onclick="analyzeAudio()" class="btn btn-analyze"><span data-lang="analyzeBtn">Analyze Audio</span> <i class="fas fa-arrow-right"></i></button>
+                        <button id="resetBtn" onclick="resetForm()" class="btn btn-reset"><span data-lang="clearBtn">Clear</span></button>
+                    </div>
+                </div>
+                <div id="loader" class="loader hidden">
+                    <div class="spinner"></div>
+                    <p data-lang="loadingMsg">Preparing analysis...</p>
+                </div>
+            </section>
+
+            <section id="history-section" class="features" style="padding-top: 2rem;">
+                <h2 data-lang="historyTitle">Download History</h2>
+                <div class="history-card">
+                    <table class="report-table" id="historyTable">
+                        <thead>
+                            <tr>
+                                <th data-lang="dateHead">Date</th>
+                                <th data-lang="fileHead">Filename</th>
+                                <th data-lang="emotionHead">Emotion</th>
+                                <th data-lang="confidenceHead">Confidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr><td colspan="4" style="text-align:center; color:#888;" data-lang="noHistory">No history yet.</td></tr>
+                        </tbody>
+                    </table>
+                    <button onclick="clearHistory()" class="btn btn-reset" style="margin-top: 15px; width: 100%;" data-lang="clearHistoryBtn">Clear History</button>
+                </div>
+            </section>
+
+            <section id="features" class="features">
+                <h2 data-lang="featuresTitle">Key Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card"><i class="fas fa-bolt"></i><h3 data-lang="feat1Title">Real-time Analysis</h3><p data-lang="feat1Desc">Get instant emotion detection results in seconds</p></div>
+                    <div class="feature-card"><i class="fas fa-chart-bar"></i><h3 data-lang="feat2Title">Detailed Metrics</h3><p data-lang="feat2Desc">View confidence scores and emotion spectrum analysis</p></div>
+                    <div class="feature-card"><i class="fas fa-lock"></i><h3 data-lang="feat3Title">Secure Processing</h3><p data-lang="feat3Desc">Your data is processed locally and never stored</p></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="analysisPage" class="results-page hidden" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+        <div class="analysis-container">
+            <div class="wave-loader"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+            <h2 style="margin-top: 2rem; color: var(--primary-color);">Processing Audio...</h2>
+            <p style="color: var(--secondary-color);">Extracting vocal features and detecting emotions</p>
+        </div>
+    </div>
+
+    <div id="resultsPage" class="results-page hidden">
+        <div class="results-container">
+            <div class="results-header">
+                <button onclick="goHome()" class="btn-back"><i class="fas fa-arrow-left"></i> <span data-lang="backBtn">Back</span></button>
+                <h1 data-lang="resultsTitle">Analysis Results</h1>
+            </div>
+            <div class="results-grid">
+                <div class="primary-emotion-card"><h2 id="resultEmotion">Happy</h2><p class="confidence-label"><span data-lang="confidenceLabel">Confidence Score:</span> <span id="resultConfidence">98%</span></p></div>
+            </div>
+            <div class="report-summary-box">
+                <h3 class="report-title" data-lang="reportDetailsTitle">Analysis Report Details</h3>
+                <table class="report-table">
+                    <tr><td class="report-label" data-lang="dateLabel">Date & Time:</td><td class="report-value" id="report-date">-</td></tr>
+                    <tr><td class="report-label" data-lang="fileLabel">File Name:</td><td class="report-value" id="report-filename">-</td></tr>
+                    <tr><td class="report-label" data-lang="emotionLabel">Detected Emotion:</td><td class="report-value emotion-value" id="report-emotion">-</td></tr>
+                    <tr><td class="report-label" data-lang="confLabel">Confidence Score:</td><td class="report-value" id="report-confidence">-</td></tr>
+                    <tr><td class="report-label" data-lang="statusLabel">Status:</td><td class="report-value status-value"><i class="fas fa-check-circle"></i> Analysis Complete</td></tr>
+                </table>
+                <table class="report-table" style="margin-top: 15px; border-top: 2px dashed #e3e6f0;">
+                    <tr><td class="report-label" style="width: 35%; border-top: none;"><i class="fas fa-user-tie"></i> <span data-lang="creatorLabel">Creator:</span></td><td class="report-value" style="font-weight: 700; color: var(--primary-color); border-top: none;">PRAKASH CHANDRAN</td></tr>
+                </table>
+            </div>
+            <div id="chart-holder">
+                <h2 data-lang="visualsTitle">Performance Visuals</h2>
+                <div class="row" style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; margin-top: 2rem;">
+                    <div style="flex: 1; min-width: 350px; height: 400px;"><canvas id="myChart1"></canvas></div>
+                    <div style="flex: 1; min-width: 350px; height: 400px;"><canvas id="myChart2"></canvas></div>
+                </div>
+            </div>
+            <div class="results-footer" id="resultsActions" style="margin-top: 30px; text-align: center;">
+                <button id="download-btn" class="btn btn-primary" onclick="initiateDownload()"><i class="fas fa-download"></i> <span data-lang="downloadBtn">Download Report</span></button>
+                <button onclick="goHome()" class="btn btn-secondary"><span data-lang="analyzeAgainBtn">Analyze Another File</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="creatorPage" class="results-page hidden">
+    <div class="creator-container">
+        <div class="results-header">
+            <button onclick="closeCreatorPage()" class="btn-back"><i class="fas fa-arrow-left"></i> <span>Back</span></button>
+            <h1>Creator Profile</h1>
+        </div>
+        <div class="creator-profile-card">
+            <div class="profile-visual">
+                <div class="profile-image-container">
+                    <img src="static/Creator/me.jpg" alt="Prakash Chandran" class="profile-avatar">
+                    <div class="verified-badge"><i class="fas fa-check"></i></div>
+                </div>
+            </div>
+            <div class="profile-content">
+                <h2 class="creator-name">PRAKASH CHANDRAN</h2>
+                <h3 class="creator-title">Lead Developer & AI Researcher</h3>
+                <p class="creator-bio">Passionate about bridging the gap between human emotion and artificial intelligence.</p>
+                
+                <div class="social-menu">
+                    <div class="social-main-btn">
+                        <i class="fas fa-share-alt"></i> Social Networks <i class="fas fa-chevron-down" style="font-size: 0.7rem;"></i>
+                    </div>
+                    <div class="social-options">
+                        <a href="https://www.instagram.com/__prakaxxh__" target="_blank" class="option-btn opt-insta">
+                            <i class="fab fa-instagram"></i> Instagram
+                        </a>
+                        <a href="https://github.com/your_github" target="_blank" class="option-btn opt-github">
+                            <i class="fab fa-github"></i> GitHub
+                        </a>
+                        <a href="https://linkedin.com/in/your_profile" target="_blank" class="option-btn opt-linkedin">
+                            <i class="fab fa-linkedin"></i> LinkedIn
+                        </a>
+                    </div>
+                </div>
+
+                <div class="creator-actions" style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                    <a href="mailto:prakashamul30@gmail.com" class="btn-impressive btn-contact" style="width: 250px; justify-content: center; text-decoration: none;">
+                        <i class="fas fa-paper-plane"></i> Contact Me
+                    </a>
+                    <a href="static/Creator/resume.pdf" download class="btn-resume" style="width: 250px; justify-content: center;">
+                        <i class="fas fa-file-pdf"></i> Download Resume
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-copyright"><p>&copy; 2025 EmotiVoice AI. All rights reserved.</p></div>
+            <div class="footer-quote">"Decoding the silent whispers of the heart."</div>
+            <div class="footer-details">
+                <div class="footer-badge admin-badge">
+                    <span class="badge-label">Creator</span>
+                    <span class="badge-text">PRAKASH CHANDRAN</span>
+                </div>
+                <div>
+                    <div class="footer-badge admin-badge">
+                    <span class="badge-label">Instagram</span>
+                    <a href="https://www.instagram.com/__prakaxxh__" target="_blank" class="option-btn opt-insta" style="color: white; text-decoration: none; margin-left: 5px;">
+                            <i class="fab fa-instagram"></i> Instagram
+                        </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('speech.static', filename='script.js') }}"></script>
+</body>
+</html>

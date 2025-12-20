@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='verify.css') }}">
+    <title>Verify Account</title>
+</head>
+<body>
+    <!-- FLASH MESSAGES START -->
+     <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+<!-- FLASH MESSAGES END -->
+    <div class="card">
+        <h2>Verify Email</h2>
+        <p class="otp-text">We sent a 6-digit code to your Gmail.</p>
+        <form action="/verify" method="POST">
+            <input type="text" name="otp" placeholder="Enter 6-digit Code" maxlength="6" required>
+            <button type="submit">Verify & Create Account</button>
+        </form>
+    </div>
+</body>
+</html>

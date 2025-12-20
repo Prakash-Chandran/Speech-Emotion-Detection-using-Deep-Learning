@@ -1,0 +1,130 @@
+/* General reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Body background */
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+/* Flash messages container */
+.container.mt-3 {
+    position: absolute;
+    top: 20px;
+    width: 90%;
+    max-width: 500px;
+}
+
+/* Card container */
+.login-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    color: #fff;
+    transition: transform 0.3s ease;
+}
+
+.login-container:hover {
+    transform: translateY(-5px);
+}
+
+/* Title */
+.login-container h2 {
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+/* Inputs */
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0 20px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+}
+
+/* Button */
+.login-container .btn {
+    width: 100%;
+    padding: 12px;
+    background: #8e44ad;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.login-container .btn:hover {
+    background: #732d91;
+}
+
+/* Links below form */
+.login-container p {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.login-container p a {
+    color: #ffd700;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-container p a:hover {
+    text-decoration: underline;
+}
+
+/* Flash message styling */
+.alert {
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.alert-success {
+    background-color: #4caf50a1;
+    color: #fff;
+}
+
+.alert-danger {
+    background-color: #f44336a1;
+    color: #fff;
+}
+
+.alert-dismissible .btn-close {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 30px 20px;
+    }
+}
