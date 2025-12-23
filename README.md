@@ -24,6 +24,8 @@ This project focuses on **detecting emotions from speech signals** using deep le
 - **TensorFlow / Keras** for deep learning
 - **Librosa** for audio processing
 - **NumPy, Pandas, Matplotlib** for data handling and visualization
+- **Flask** (or your web framework) for the web application
+- **SQLite** for the database (`users.db`)
 
 ---
 
@@ -48,7 +50,7 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 3. Install required packages:
-  ~ Run this in your Terminal with the actual path of the file located using ' cd file-path '
+- Run this in your Terminal with the actual path of the file located using ' cd file-path '
 ```
 pip install -r requirements.txt
 ```
